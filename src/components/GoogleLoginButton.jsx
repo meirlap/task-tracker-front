@@ -1,19 +1,19 @@
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import jwt_decode from 'jwt-decode';
 
-const GoogleLoginButton = ({ onSuccess }) => {
+const GoogleLoginButton = () => {
   return (
-    <GoogleLogin
-      onSuccess={(credentialResponse) => {
-        const decoded = jwt_decode(credentialResponse.credential);
-        console.log('🔓 Decoded Google User:', decoded);
-        onSuccess(decoded);
-      }}
-      onError={() => {
-        console.error('❌ Login Failed');
-      }}
-    />
+    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+      <GoogleLogin
+        onSuccess={(credentialResponse) => {
+          console.log('Login Success:', credentialResponse);
+        }}
+        onError={() => {
+          console.error('Login Failed');
+        }}
+        useOneTap
+      />
+    </div>
   );
 };
 

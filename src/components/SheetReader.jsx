@@ -1,34 +1,45 @@
-import React, { useEffect, useState } from 'react';
-import { getSheetData } from '../googleSheets';
+import React, { useEffect, useState } from "react";
+import { fetchSheetData } from "../googleSheets";
 
-const SheetReader = ({ user }) => {
-  const [tasks, setTasks] = useState([]);
+const SheetReader = () => {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const allTasks = await getSheetData();
-        const userTasks = allTasks.filter(
-          task => task['ID Patient']?.toString().includes(user.email)
-        );
-        setTasks(userTasks);
-        console.log('📄 Filtered tasks for user:', user.email, userTasks);
-      } catch (error) {
-        console.error('❌ Failed to fetch sheet data:', error);
-      }
-    };
+    fetchSheetData()
+      .then(values => {
+        setData(values);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching sheet:", err);
+        setLoading(false);
+      });
+  }, []);
 
-    fetchTasks();
-  }, [user]);
+  if (loading) return <p>טוען נתונים...</p>;
 
   return (
-    <div>
-      <h2>משימות שלך</h2>
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={index}>{task['Daily Task']} - {task['TaskDate']}</li>
-        ))}
-      </ul>
+    <div style={{ marginTop: "2rem" }}>
+      <h2>נתונים מהשיטס</h2>
+      <table border="1" style={{ margin: "auto", direction: "rtl" }}>
+        <thead>
+          <tr>
+            {data[0]?.map((header, i) => (
+              <th key={i}>{header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.slice(1).map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => (
+                <td key={j}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
